@@ -1,0 +1,17 @@
+%dw 2.0
+
+type auto_a1b71994_b7a3_43fb_aa23_ce1292958513_Input_Payload = {
+  country?: String, 
+  discription?: String, 
+  city?: String, 
+  phone?: String, 
+  last_name: String, 
+  company: String, 
+  state?: String, 
+  postal_code?: String, 
+  title?: String, 
+  first_name?: String, 
+  email?: String, 
+  _?: Any
+} {"description": "det leads response"}
+

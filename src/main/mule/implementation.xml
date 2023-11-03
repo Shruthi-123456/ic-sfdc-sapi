@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="get-all-leads-implementation" doc:id="39159fd9-9d84-4018-8386-1b46faae38f5" >
+		<logger level="INFO" doc:name="get-all-leads-implementation-Flow Started " doc:id="3970d18d-90e1-4153-bf55-54dc6c2a18f5" message="get-all-leads-implementation-Flow Started "/>
+		<salesforce:query doc:name="Get All Leads From Salesforce" doc:id="eb243060-e79f-4b29-a417-24408749e61a" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query ><![CDATA[SELECT City,Company,Country,Description,Email,FirstName,Id,LastName,Phone,PostalCode,State,Title,External_Id__c,SyncNewRecordTodb__c,SyncUpdateRecordTodb__c FROM Lead ]]></salesforce:salesforce-query>
+		</salesforce:query>
+		<ee:transform doc:name="DW Set To Get All Leads Respnose Transform" doc:id="5bbadd94-44bd-45e6-b958-a036c00584be" >
+			<ee:message >
+				<ee:set-payload resource="dwlScripts/get-all-leads-response.dwl" />
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="get-all-leads-implementation-Flow Ended" doc:id="9af24619-546b-4549-b42b-9343d2de4b78" message="get-all-leads-implementation-Flow Ended"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="3543fe68-563e-4154-be38-dfe54e946d67" type="ANY">
+				<ee:transform doc:name="DW Transform for Error mapping" doc:id="3c167195-bf56-416c-81ef-1a2cf43661e7" >
+					<ee:variables >
+						<ee:set-variable resource="dwlScripts/v-error-response-sftp-error.dwl" variableName="vErrorMapping" />
+					</ee:variables>
+				</ee:transform>
+				<flow-ref doc:name="sf-common-error-response" doc:id="acd6fb3b-013c-43f4-be27-cd0ceb6964ea" name="sf-common-error-response" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="create-leads-implementation" doc:id="eca2346b-6277-4ad0-9871-b885c4724a08" >
+		<logger level="INFO" doc:name="create-leads-implementation Flow Started" doc:id="56909d60-0bab-4b82-93ce-aae87bfbb673" message="create-leads-implementation Flow Started"/>
+		<ee:transform doc:name="DW Set To Create Leads Request Transform" doc:id="9da514bb-2131-4670-ac27-3d0912f75a95" >
+			<ee:message >
+				<ee:set-payload resource="dwlScripts/create-leads-request.dwl" />
+			</ee:message>
+		</ee:transform>
+		<salesforce:create doc:name="Create Leads On Salesforce" doc:id="c7dcef6f-5923-403f-b748-4ee7bf29c7e2" config-ref="Salesforce_Config" type="Lead"/>
+		<ee:transform doc:name="DW Set To Create Leads Response Transform" doc:id="a244b7f7-df92-47bb-a666-09312247e4ee" >
+			<ee:message >
+				<ee:set-payload resource="dwlScripts/create-leads-response.dwl" />
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="create-leads-implementation Flow Ended" doc:id="52024aa9-200c-4ddf-bf5d-8e0289e5d3bf" message="create-leads-implementation Flow Ended"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="b795710c-1c61-4f01-87ef-f9a721a4e931" type="ANY">
+				<ee:transform doc:name="DW Transform for Error mapping" doc:id="a5955c95-ca45-4b38-8804-c3b4b4f21c94" >
+					<ee:variables >
+						<ee:set-variable resource="dwlScripts/v-error-response-sftp-error.dwl" variableName="vErrorMapping" />
+					</ee:variables>
+				</ee:transform>
+				<flow-ref doc:name="sf-common-error-response" doc:id="b35695b9-9ef8-474d-a895-37a07ea65ea9" name="sf-common-error-response" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="get-leads-by-id-implementation" doc:id="09afed49-19b9-4b8c-8137-e795c2f8ab15" >
+		<logger level="INFO" doc:name="get-leads-by-id-implementation Flow Started" doc:id="fe8c6d0b-6067-4022-a4af-d4550c189cee" message="get-leads-by-id-implementation Flow Started"/>
+		<salesforce:query doc:name="Get Leads From Salesforce Based On Id" doc:id="e4127647-f4bd-4825-94ca-911e7aac26a8" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query ><![CDATA[SELECT City,Company,Country,Description,Email,FirstName,Id,LastName,Phone,PostalCode,State,Title, External_Id__c,SyncNewRecordTodb__c,SyncUpdateRecordTodb__c FROM Lead where Id=':id']]></salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[{
+	"id" : attributes.uriParams.id
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<ee:transform doc:name="DW Set To Get All Leads Response Transform" doc:id="816b21ed-87ce-43c5-af9a-e5116fe106fa" >
+			<ee:message >
+				<ee:set-payload resource="dwlScripts/get-leads-by-id-response.dwl" />
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="get-leads-by-id-implementation Flow Ended" doc:id="558d38ad-3bec-4778-8385-643796318c42" message="get-leads-by-id-implementation Flow Ended"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="dafbefdb-75c8-4355-8c66-e979b55820d8" type="ANY">
+				<ee:transform doc:name="DW Transform for Error mapping" doc:id="772fd313-bf80-4be5-848b-81469b640a70" >
+					<ee:variables >
+						<ee:set-variable resource="dwlScripts/v-error-response-sftp-error.dwl" variableName="vErrorMapping" />
+					</ee:variables>
+				</ee:transform>
+				<flow-ref doc:name="sf-common-error-response" doc:id="2bdf072f-20ef-4b91-893c-825caf5c9284" name="sf-common-error-response" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="delete-leads-implementation" doc:id="31cd8c2d-030b-424f-9ee4-e745861234e9" >
+		<logger level="INFO" doc:name="delete-leads-implementation Flow Started" doc:id="b2cb89d5-6840-4f6d-bb76-ebf3e4c8cc91" message="delete-leads-implementation Flow Started"/>
+		<ee:transform doc:name="Set Variable To Store Id" doc:id="0c4ef5b6-9041-466c-baf1-efe1f7e7b25e" >
+			<ee:variables >
+				<ee:set-variable variableName="id" ><![CDATA[attributes.uriParams.'id']]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<salesforce:delete doc:name="Delete Leads From Salesforce" doc:id="e5e13a55-339f-494d-aa78-dc2af7521bd5" config-ref="Salesforce_Config">
+			<salesforce:ids ><![CDATA[#[[vars.id]]]]></salesforce:ids>
+		</salesforce:delete>
+		<ee:transform doc:name="DW Set To Delete Leads Response Transform" doc:id="8c66409e-4f4f-4380-9b48-1795494bbb32" >
+			<ee:message >
+				<ee:set-payload resource="dwlScripts/delete-leads-response.dwl" />
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="delete-leads-implementation Flow Ended" doc:id="cc3f0068-c3ab-4d53-bb5f-3af8f635d99c" message="delete-leads-implementation Flow Ended"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="5a65776c-2df1-47b0-aa43-2303e72bb7b2" type="ANY">
+				<ee:transform doc:name="DW Transform for Error mapping" doc:id="9905b213-ed97-410a-bdb6-0f104d05d9b3" >
+					<ee:variables >
+						<ee:set-variable resource="dwlScripts/v-error-response-sftp-error.dwl" variableName="vErrorMapping" />
+					</ee:variables>
+				</ee:transform>
+				<flow-ref doc:name="sf-common-error-response" doc:id="45530f5b-ec78-4928-b892-82a6e2a80207" name="sf-common-error-response" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="update-leads-implementation" doc:id="a1b71994-b7a3-43fb-aa23-ce1292958513" >
+		<logger level="INFO" doc:name="update-leads-implementation Flow Started" doc:id="02ce82bc-fcc8-4c50-a5f6-12e55d28736b" message="update-leads-implementation Flow Started"/>
+		<ee:transform doc:name="Set Variable To Store Id" doc:id="506b81b5-a358-44bd-8194-3ab4f44788ca">
+			<ee:variables>
+				<ee:set-variable variableName="id"><![CDATA[attributes.uriParams.'id']]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="DW Scripts To Update Leads Request Transform" doc:id="9bd427d7-5c64-4dd9-8bbe-3ef56101be54" >
+			<ee:message >
+				<ee:set-payload resource="dwlScripts/update-leads-request.dwl" />
+			</ee:message>
+			<ee:variables >
+			</ee:variables>
+		</ee:transform>
+		<salesforce:update type="Lead" doc:name="Update Leads On Salesforce" doc:id="0216a427-05fc-4386-9e73-acca91c9cba2" config-ref="Salesforce_Config"/>
+		<ee:transform doc:name="DW Set To Update Leads Response Transform" doc:id="78bd19ff-c5c8-4a00-87a7-c8e46f460f38" >
+			<ee:message >
+				<ee:set-payload resource="dwlScripts/update-leads-response.dwl" />
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="update-leads-implementation Flow Ended" doc:id="41e89380-27f7-4e51-a186-18cf07d23ac7" message="update-leads-implementation Flow Ended"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="958762b2-002c-49c2-b8e4-edf46ffddfb5" type="ANY">
+				<ee:transform doc:name="DW Transform for Error mapping" doc:id="d375a7cd-1e11-4cd3-9e76-b47e062fd12d" >
+					<ee:variables >
+						<ee:set-variable resource="dwlScripts/v-error-response-sftp-error.dwl" variableName="vErrorMapping" />
+					</ee:variables>
+				</ee:transform>
+				<flow-ref doc:name="sf-common-error-response" doc:id="a6ae55db-bf31-4804-9806-301cfd53c50a" name="sf-common-error-response" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>

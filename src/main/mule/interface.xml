@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    <flow name="ic-sfdc-sapi-main">
+        <http:listener config-ref="ic-sfdc-sapi-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="ic-sfdc-sapi-config" />
+        <error-handler ref="Error_Handler" />
+    </flow>
+    <flow name="ic-sfdc-sapi-console">
+        <http:listener config-ref="ic-sfdc-sapi-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="ic-sfdc-sapi-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform doc:name="Transform Message">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="put:\leads\(id):application\json:ic-sfdc-sapi-config">
+        <flow-ref doc:name="Ref update-leads-implementation" doc:id="549befe0-0c28-4597-9768-5335aad80f01" name="update-leads-implementation" />
+    </flow>
+    <flow name="delete:\leads\(id):ic-sfdc-sapi-config">
+        <flow-ref doc:name="Ref delete-leads-implementation" doc:id="443f30dc-718e-4dd9-8c75-42969b244c03" name="delete-leads-implementation" />
+    </flow>
+    <flow name="get:\leads:ic-sfdc-sapi-config">
+        <flow-ref doc:name="Ref get-all-leads-implementation" doc:id="43ef0be0-7b77-4ba8-b222-89f9eb93a5c8" name="get-all-leads-implementation" />
+    </flow>
+    <flow name="get:\leads\(id):ic-sfdc-sapi-config">
+        <flow-ref doc:name="Ref get-leads-by-id-implementation" doc:id="05fe19c1-9050-457d-821f-4a59df7fc356" name="get-leads-by-id-implementation" />
+    </flow>
+    <flow name="post:\leads:application\json:ic-sfdc-sapi-config">
+        <flow-ref doc:name="Ref create-leads-implementation" doc:id="5eea4a04-df5f-4fbe-9fce-e28b5c48ed17" name="create-leads-implementation" />
+    </flow>
+</mule>

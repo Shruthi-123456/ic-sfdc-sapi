@@ -1,0 +1,21 @@
+%dw 2.0
+
+type auto_09afed49_19b9_4b8c_8137_e795c2f8ab15_Output_Payload = Array<Lead>
+type Lead = {|
+  City?: String {"typeId": "City"}, 
+  Company?: String {"typeId": "Company"}, 
+  Country?: String {"typeId": "Country"}, 
+  Description?: String {"typeId": "Description"}, 
+  Email?: String {"typeId": "Email"}, 
+  FirstName?: String {"typeId": "FirstName"}, 
+  Id?: String {"typeId": "Id"}, 
+  LastName?: String {"typeId": "LastName"}, 
+  Phone?: String {"typeId": "Phone"}, 
+  PostalCode?: String {"typeId": "PostalCode"}, 
+  State?: String {"typeId": "State"}, 
+  Title?: String {"typeId": "Title"}
+|} {"label": "Lead",
+"typeId": "Lead"}
+
+
+

@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_39159fd9_9d84_4018_8386_1b46faae38f5_Output_Payload = Array<{  country: String,   city: String,   last_name: String,   description: String | Null,   company: String,   state: String,   postal_code: String,   title: String,   first_name: String,   email: String,   _?: Any}>
+

@@ -1,0 +1,17 @@
+%dw 2.0
+
+type auto_eca2346b_6277_4ad0_9871_b885c4724a08_Input_Payload = {
+  country?: String, 
+  discription?: String, 
+  city?: String, 
+  phone?: String, 
+  last_name: String, 
+  company: String, 
+  state?: String, 
+  postal_code?: String, 
+  title?: String, 
+  first_name?: String, 
+  email?: String, 
+  _?: Any
+} {"description": "post the leads"}
+

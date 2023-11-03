@@ -1,0 +1,18 @@
+[
+  {
+        "company": "Jackson Controls",
+        "description": null,
+        "email": "jeffg@jackson.com",
+        "first_name": "Jeff",
+        "postal_code": null,
+        "title": "SVP, Procurement",
+        "city": "city",
+        "Phone": "886-2-25474189",
+        "State": null,
+        "country": "Taiwan",
+        "last_name": "Glimpse",
+        "id": "00Q5j00000OKambEAD",
+        "sync_new_record_to_db": "true",
+        "sync_update_record_to_db": "true",
+        "external_id": 12
+    }]
